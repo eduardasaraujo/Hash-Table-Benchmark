@@ -1,4 +1,11 @@
-//enchmark "de carga real" comparando as 3 implementacoes de hash table encadeamento fechado, enderecamento aberto, double hashing) em insercao, busca (hit e miss) e remocao de N chaves, variando o fator de carga (alpha = N / tamanho_da_tabela). Gera benchmark_results.csv.//
+// Benchmark "de carga real" comparando as 3 implementacoes de hash table encadeamento fechado, enderecamento aberto, double hashing) em insercao, busca (hit e miss) e remocao de N chaves, variando o fator de carga.//
+
+/* O QUE E O FATOR DE CARGA (ALPHA / α)?
+ 
+alpha = (quantidade de itens inseridos) / (tamanho da tabela)
+
+Exemplo: tabela com 1000 posicoes e 900 itens inseridos -> alpha = 0.9 (a tabela esta 90% cheia).
+*/
 
 #define _POSIX_C_SOURCE 200112L
 #include <stdio.h>
@@ -11,8 +18,16 @@
 #include "../src/hashTableOA/hashTableAberto.h"
 #include "../src/hashTableOADH/hashTableDoubleHashing.h"
 
-#define N 20000
-#define REPS 3
+#define N 20000 // quantidade de chaves inseridas/buscadas/removidas em cada configuracao //
+#define REPS 3  // repeticoes por configuracao, para suavizar ruido de medicao //
+
+/* Fatores de carga testados, do mais folgado ao quase-lotado:
+0.50 -> tabela com o dobro de posicoes do numero de itens (bem folgada)
+0.70 -> carga moderada, ainda confortavel
+0.90 -> tabela bem cheia, poucas posicoes livres
+0.95 -> quase no limite (so 5% das posicoes livres)
+O tamanho de tabela usado em cada caso e table_size = N / alpha (arredondado para o proximo numero primo, ver next_prime() abaixo). 
+*/
 
 static const double ALPHAS[] = {0.5, 0.7, 0.9, 0.95};
 #define N_ALPHAS (int)(sizeof(ALPHAS) / sizeof(ALPHAS[0]))
