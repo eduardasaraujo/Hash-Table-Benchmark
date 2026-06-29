@@ -11,9 +11,13 @@ SRC = \
 TEST_SRC = tests/test_suite.c
 TEST_BIN = test_suite
 
-.PHONY: all test clean
+TIMING_SRC = tests/test_suite_timed.c
+TIMING_BIN = test_suite_timed
+TIMING_CSV = tests_timing.csv
 
-# 'make' apenas compila a suite de testes (nao ha um executavel principal unico)
+.PHONY: all test timing clean
+
+# 'make' apenas compila a suite de testes
 all: $(TEST_BIN)
 
 $(TEST_BIN): $(TEST_SRC) $(SRC)
@@ -23,5 +27,12 @@ $(TEST_BIN): $(TEST_SRC) $(SRC)
 test: $(TEST_BIN)
 	./$(TEST_BIN)
 
+# 'make timing' compila e executa a comparação de tempo
+$(TIMING_BIN): $(TIMING_SRC) $(SRC)
+	$(CC) $(CFLAGS) $(TIMING_SRC) $(SRC) -o $(TIMING_BIN)
+
+timing: $(TIMING_BIN)
+	./$(TIMING_BIN)
+
 clean:
-	rm -f $(TEST_BIN)
+	rm -f $(TEST_BIN) $(TIMING_BIN) $(TIMING_CSV)
