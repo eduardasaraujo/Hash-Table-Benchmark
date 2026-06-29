@@ -15,7 +15,11 @@ TIMING_SRC = tests/test_suite_timed.c
 TIMING_BIN = test_suite_timed
 TIMING_CSV = tests_timing.csv
 
-.PHONY: all test timing clean
+BENCH_SRC = tests/hashtable_benchmark.c
+BENCH_BIN = hashtable_benchmark
+BENCH_CSV = benchmark_results.csv
+
+.PHONY: all test timing benchmark clean
 
 # 'make' apenas compila a suite de testes
 all: $(TEST_BIN)
@@ -34,5 +38,12 @@ $(TIMING_BIN): $(TIMING_SRC) $(SRC)
 timing: $(TIMING_BIN)
 	./$(TIMING_BIN)
 
+# 'make benchmark' compila e executa o benchmark
+$(BENCH_BIN): $(BENCH_SRC) $(SRC)
+	$(CC) $(CFLAGS) $(BENCH_SRC) $(SRC) -o $(BENCH_BIN)
+
+benchmark: $(BENCH_BIN)
+	./$(BENCH_BIN)
+
 clean:
-	rm -f $(TEST_BIN) $(TIMING_BIN) $(TIMING_CSV)
+	rm -f $(TEST_BIN) $(TIMING_BIN) $(TIMING_CSV) $(BENCH_BIN) $(BENCH_CSV)
