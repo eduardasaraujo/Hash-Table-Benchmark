@@ -17,6 +17,16 @@
 static const double ALPHAS[] = {0.5, 0.7, 0.9, 0.95};
 #define N_ALPHAS (int)(sizeof(ALPHAS) / sizeof(ALPHAS[0]))
 
+// Gera chaves bem distribuidas via permutacao multiplicativa modulo um primo grande (key(x) = (x+1)*MULT mod PRIME). Isso evita o artefato de "chave tamanho_da_tabela == chave" que ocorreria com chaves sequenciais 0..N-1 quando tamanho_da_tabela > N. //
+#define KEY_PRIME 2000000011ULL
+#define KEY_MULT  999999937ULL
+
+static int gen_key(int x) {
+    unsigned long long v =
+        ((unsigned long long)(x + 1) * KEY_MULT) % KEY_PRIME;
+    return (int)v;
+}
+
 typedef struct {
     double insert, search_hit, search_miss, del;
 } Times;
@@ -53,7 +63,7 @@ static Times bench_chaining(const int *order, int table_size) {
     Times t = {0, 0, 0, 0};
     HashTable *ht = hashTable_create(table_size);
     Item **items = malloc(sizeof(Item *) * N);
-    for (int i = 0; i < N; i++) items[i] = item_create(i, 'A');
+    for (int i = 0; i < N; i++) items[i] = item_create(gen_key(i), 'A');
 
     struct timespec s, e;
     clock_gettime(CLOCK_MONOTONIC, &s);
@@ -62,17 +72,17 @@ static Times bench_chaining(const int *order, int table_size) {
     t.insert = elapsed(s, e);
 
     clock_gettime(CLOCK_MONOTONIC, &s);
-    for (int i = 0; i < N; i++) hashTable_search(ht, order[i]);
+    for (int i = 0; i < N; i++) hashTable_search(ht, gen_key(order[i]));
     clock_gettime(CLOCK_MONOTONIC, &e);
     t.search_hit = elapsed(s, e);
 
     clock_gettime(CLOCK_MONOTONIC, &s);
-    for (int i = 0; i < N; i++) hashTable_search(ht, N + order[i]);
+    for (int i = 0; i < N; i++) hashTable_search(ht, gen_key(N + order[i]));
     clock_gettime(CLOCK_MONOTONIC, &e);
     t.search_miss = elapsed(s, e);
 
     clock_gettime(CLOCK_MONOTONIC, &s);
-    for (int i = 0; i < N; i++) hashTable_delete(ht, order[i]);
+    for (int i = 0; i < N; i++) hashTable_delete(ht, gen_key(order[i]));
     clock_gettime(CLOCK_MONOTONIC, &e);
     t.del = elapsed(s, e);
 
@@ -86,7 +96,7 @@ static Times bench_open_addressing(const int *order, int table_size) {
     Times t = {0, 0, 0, 0};
     HashTableAberto *ht = hashTableAberto_create(table_size);
     Item **items = malloc(sizeof(Item *) * N);
-    for (int i = 0; i < N; i++) items[i] = item_create(i, 'A');
+    for (int i = 0; i < N; i++) items[i] = item_create(gen_key(i), 'A');
 
     struct timespec s, e;
     clock_gettime(CLOCK_MONOTONIC, &s);
@@ -95,17 +105,17 @@ static Times bench_open_addressing(const int *order, int table_size) {
     t.insert = elapsed(s, e);
 
     clock_gettime(CLOCK_MONOTONIC, &s);
-    for (int i = 0; i < N; i++) hashTableAberto_search(ht, order[i]);
+    for (int i = 0; i < N; i++) hashTableAberto_search(ht, gen_key(order[i]));
     clock_gettime(CLOCK_MONOTONIC, &e);
     t.search_hit = elapsed(s, e);
 
     clock_gettime(CLOCK_MONOTONIC, &s);
-    for (int i = 0; i < N; i++) hashTableAberto_search(ht, N + order[i]);
+    for (int i = 0; i < N; i++) hashTableAberto_search(ht, gen_key(N + order[i]));
     clock_gettime(CLOCK_MONOTONIC, &e);
     t.search_miss = elapsed(s, e);
 
     clock_gettime(CLOCK_MONOTONIC, &s);
-    for (int i = 0; i < N; i++) hashTableAberto_delete(ht, order[i]);
+    for (int i = 0; i < N; i++) hashTableAberto_delete(ht, gen_key(order[i]));
     clock_gettime(CLOCK_MONOTONIC, &e);
     t.del = elapsed(s, e);
 
@@ -119,7 +129,7 @@ static Times bench_double_hashing(const int *order, int table_size) {
     Times t = {0, 0, 0, 0};
     HashTableAbertoDH *ht = hashTableAbertoDH_create(table_size);
     Item **items = malloc(sizeof(Item *) * N);
-    for (int i = 0; i < N; i++) items[i] = item_create(i, 'A');
+    for (int i = 0; i < N; i++) items[i] = item_create(gen_key(i), 'A');
 
     struct timespec s, e;
     clock_gettime(CLOCK_MONOTONIC, &s);
@@ -128,17 +138,17 @@ static Times bench_double_hashing(const int *order, int table_size) {
     t.insert = elapsed(s, e);
 
     clock_gettime(CLOCK_MONOTONIC, &s);
-    for (int i = 0; i < N; i++) hashTableAbertoDH_search(ht, order[i]);
+    for (int i = 0; i < N; i++) hashTableAbertoDH_search(ht, gen_key(order[i]));
     clock_gettime(CLOCK_MONOTONIC, &e);
     t.search_hit = elapsed(s, e);
 
     clock_gettime(CLOCK_MONOTONIC, &s);
-    for (int i = 0; i < N; i++) hashTableAbertoDH_search(ht, N + order[i]);
+    for (int i = 0; i < N; i++) hashTableAbertoDH_search(ht, gen_key(N + order[i]));
     clock_gettime(CLOCK_MONOTONIC, &e);
     t.search_miss = elapsed(s, e);
 
     clock_gettime(CLOCK_MONOTONIC, &s);
-    for (int i = 0; i < N; i++) hashTableAbertoDH_delete(ht, order[i]);
+    for (int i = 0; i < N; i++) hashTableAbertoDH_delete(ht, gen_key(order[i]));
     clock_gettime(CLOCK_MONOTONIC, &e);
     t.del = elapsed(s, e);
 
