@@ -1,0 +1,5 @@
+Suite,Repeticoes,Testes_por_execucao,Assertions_por_execucao,Falhas,Tempo_total_s,Tempo_medio_por_execucao_ms
+Lista Duplamente Encadeada,2000,7,7,0,0.00604146,0.00302073
+Hash Table - Encadeamento Fechado,2000,5,6,0,0.00737059,0.00368529
+Hash Table - Enderecamento Aberto,2000,9,10,0,0.01196999,0.00598500
+Hash Table - Enderecamento Aberto (Double Hashing),2000,9,10,0,0.01299920,0.00649960
