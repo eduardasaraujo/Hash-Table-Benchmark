@@ -64,16 +64,14 @@ python tools/build_timing_excel.py      # gera tests_timing.xlsx
 python tools/build_benchmark_excel.py   # gera benchmark_results.xlsx
 ```
 
-Resultados
+## Resultados
 
-Após rodar o benchmark (make benchmark) e a comparação de tempo (make timing) diversas vezes, com diferentes fatores de carga (alpha), observei:
+Após rodar o benchmark (`make benchmark`) e a comparação de tempo (`make timing`) diversas vezes, com diferentes fatores de carga (alpha), observamos:
 
+- Para fatores de carga baixos a moderados (α até ~0.70), o **endereçamento aberto (sondagem linear)** costuma ser a implementação mais rápida no total, superando o encadeamento fechado por uma margem considerável.
+- O **encadeamento fechado** tende a manter um desempenho mais estável e previsível conforme α aumenta, já que cada posição da tabela aponta para sua própria lista, mas paga o preço de mais alocações dinâmicas na inserção.
+- O custo de **busca por chave ausente (search miss)** cresce de forma acentuada nas estratégias de endereçamento aberto à medida que α se aproxima de 1, especialmente no **double hashing**, pois mais sondagens são necessárias até encontrar uma posição vazia.
+- Em fatores de carga muito altos (α perto de 0.95, tabela quase cheia), o encadeamento fechado costuma voltar a ser competitivo e, em algumas execuções, até supera o double hashing no tempo total — evidenciando a degradação do endereçamento aberto sob alta taxa de ocupação.
+- Os valores absolutos variam de execução para execução (dependem de carga da máquina, hardware e aleatoriedade das chaves geradas), mas essas tendências relativas entre as três implementações se repetiram de forma consistente nos testes que fizemos.
 
-Para fatores de carga baixos a moderados (α até ~0.70), o endereçamento aberto (sondagem linear) costuma ser a implementação mais rápida no total, superando o encadeamento fechado por uma margem considerável.
-O encadeamento fechado tende a manter um desempenho mais estável e previsível conforme α aumenta, já que cada posição da tabela aponta para sua própria lista, mas paga o preço de mais alocações dinâmicas na inserção.
-O custo de busca por chave ausente (search miss) cresce de forma acentuada nas estratégias de endereçamento aberto à medida que α se aproxima de 1, especialmente no double hashing, pois mais sondagens são necessárias até encontrar uma posição vazia.
-Em fatores de carga muito altos (α perto de 0.95, tabela quase cheia), o encadeamento fechado costuma voltar a ser competitivo e, em algumas execuções, até supera o double hashing no tempo total — evidenciando a degradação do endereçamento aberto sob alta taxa de ocupação.
-Os valores absolutos variam de execução para execução (dependem de carga da máquina, hardware e aleatoriedade das chaves geradas), mas essas tendências relativas entre as três implementações se repetiram de forma consistente nos testes que fizemos.
-
-
-Os dados brutos de cada execução ficam salvos em tests_timing.csv / tests_timing.xlsx e benchmark_results.csv / benchmark_results.xlsx, caso queira inspecionar números específicos.
+Os dados brutos de cada execução ficam salvos em `tests_timing.csv` / `tests_timing.xlsx` e `benchmark_results.csv` / `benchmark_results.xlsx`, caso queira inspecionar números específicos.
